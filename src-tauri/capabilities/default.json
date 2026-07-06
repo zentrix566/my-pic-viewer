@@ -1,0 +1,35 @@
+{
+  "$schema": "https://schema.tauri.app/config/2/../capability.schema.json",
+  "identifier": "default",
+  "description": "my-pic-viewer 默认权限",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "core:window:allow-set-fullscreen",
+    "core:window:allow-set-title",
+    "core:window:allow-set-focus",
+    "core:webview:default",
+    "core:event:default",
+    "core:app:default",
+    "core:path:default",
+    "core:resources:default",
+    "core:menu:default",
+    "core:tray:default",
+    "dialog:default",
+    "dialog:allow-open",
+    "dialog:allow-save",
+    "dialog:allow-message",
+    "dialog:allow-ask",
+    "dialog:allow-confirm",
+    "clipboard-manager:default",
+    "clipboard-manager:allow-write-text",
+    "fs:default",
+    {
+      "identifier": "fs:scope",
+      "allow": [{ "path": "**" }]
+    },
+    "fs:allow-read-file",
+    "fs:allow-write-file",
+    "fs:allow-read-dir"
+  ]
+}
