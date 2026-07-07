@@ -277,12 +277,27 @@ onMounted(async () => {
     />
 
     <div class="body">
-      <ImageCanvas
-        :path="currentPath"
-        class="canvas"
-        @dblclick="fitToWindow"
-        @loaded="onImageLoaded"
-      />
+      <div class="canvas-wrap">
+        <ImageCanvas
+          :path="currentPath"
+          class="canvas"
+          @dblclick="fitToWindow"
+          @loaded="onImageLoaded"
+        />
+        <!-- 悬浮翻页箭头：只在多张图时显示 -->
+        <button
+          v-if="total > 1"
+          class="nav-arrow nav-left"
+          title="上一张 (←)"
+          @click.stop="prev"
+        >❮</button>
+        <button
+          v-if="total > 1"
+          class="nav-arrow nav-right"
+          title="下一张 (→)"
+          @click.stop="next"
+        >❯</button>
+      </div>
       <InfoPanel
         v-if="showInfo"
         :file-info="fileInfo"
@@ -325,8 +340,47 @@ onMounted(async () => {
   min-height: 0;
   display: flex;
 }
-.canvas {
+.canvas-wrap {
+  position: relative;
   flex: 1;
   min-width: 0;
+}
+.canvas {
+  width: 100%;
+  height: 100%;
+}
+.nav-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  width: 48px;
+  height: 84px;
+  background: rgba(0, 0, 0, 0.3);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  font-size: 30px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0.55;
+  transition: opacity 120ms, background 120ms, border-color 120ms;
+  user-select: none;
+  font-family: 'Segoe UI Symbol', sans-serif;
+  padding: 0;
+}
+.nav-arrow:hover {
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.6);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+.nav-arrow:active {
+  background: rgba(0, 0, 0, 0.8);
+}
+.nav-left {
+  left: 16px;
+}
+.nav-right {
+  right: 16px;
 }
 </style>
