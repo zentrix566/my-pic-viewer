@@ -2,6 +2,7 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow'
 import { listen } from '@tauri-apps/api/event'
+import { getName, getVersion } from '@tauri-apps/api/app'
 import { confirm, message, open as openDialog, save as saveDialog } from '@tauri-apps/plugin-dialog'
 
 import ImageCanvas from './components/ImageCanvas.vue'
@@ -187,6 +188,29 @@ async function exitFullscreen() {
   isFullscreen.value = false
 }
 
+// ---------- 关于对话框 ----------
+async function showAbout() {
+  let appName = 'my-pic-viewer'
+  let appVersion = '0.1.0'
+  try {
+    appName = await getName()
+    appVersion = await getVersion()
+  } catch {
+    /* 开发时若未就绪，用默认值 */
+  }
+  const body = [
+    `${appName} v${appVersion}`,
+    '',
+    '一个绿色版图片浏览器',
+    '',
+    '作者：zentrix566',
+    '邮箱：zentrix566@gmail.com',
+    '项目：https://github.com/zentrix566/my-pic-viewer',
+    '许可证：MIT'
+  ].join('\n')
+  await message(body, { title: '关于 my-pic-viewer', kind: 'info' })
+}
+
 // ---------- 键盘 ----------
 useKeyboard({
   onPrev: () => prev(),
@@ -249,6 +273,7 @@ onMounted(async () => {
       @toggle-info="showInfo = !showInfo"
       @toggle-thumbnails="showThumbnails = !showThumbnails"
       @toggle-fullscreen="toggleFullscreen"
+      @about="showAbout"
     />
 
     <div class="body">

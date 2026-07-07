@@ -18,6 +18,7 @@
 - **文件关联**：可从资源管理器"打开方式"选择本程序，双击图片直接打开
 - **单实例**：已开着窗口时再双击图片会切换到已有窗口，而不是开新的
 - **拖拽打开**：直接把图片拖进窗口即可加载所在目录
+- **关于对话框**：工具栏右上角 `?` 按钮查看软件信息（作者 zentrix566、版本、许可证）
 
 支持格式：JPG / JPEG / PNG / GIF / BMP / WebP / ICO / TIF / TIFF
 
@@ -57,10 +58,10 @@
 npm install
 ```
 
-生成应用图标（首次构建前执行一次；把你的 logo 换成 1024×1024 的 PNG 后运行）：
+生成应用图标（如需替换默认占位图标，把 `src-tauri/icons/source.png` 换成你的 1024×1024 PNG 后重跑；仓库已附带一版占位图标）：
 
 ```bash
-npx tauri icon path/to/your-logo.png
+npx tauri icon src-tauri/icons/source.png
 ```
 
 启动开发模式（会同时起 Vite 与 Tauri 窗口，热更新）：
@@ -74,6 +75,11 @@ npm run tauri:dev
 ```bash
 npm run tauri:build
 ```
+
+构建完成后会得到两个产物：
+
+- **绿色版单 exe（首选）**：`src-tauri/target/release/my-pic-viewer.exe` —— 直接拷到任何目录双击即可运行，无需安装
+- **NSIS 安装包**：`src-tauri/target/release/bundle/nsis/my-pic-viewer_0.1.0_x64-setup.exe` —— 传统安装程序，双击安装到用户目录
 
 ## 常用命令
 
@@ -132,7 +138,8 @@ my-pic-viewer/
 
 ## 关于"绿色版"
 
-- 构建产物是**单个 .exe**，直接拷到任何位置双击即用
+- 构建产物 `target/release/my-pic-viewer.exe` 就是**单个 .exe**，直接拷到任何位置双击即用
+- 已通过 `bundle.publisher` / `bundle.copyright` 把作者 zentrix566 写入 Windows exe 版本资源；右键 exe → 属性 → 详细信息 里能看到"公司"、"版权"、"文件说明"等字段
 - 不写系统注册表；文件关联在 Windows"打开方式"里手动选择本程序一次即可
 - 单实例通过 `tauri-plugin-single-instance` 实现，命令行参数会转发给已运行的窗口
 - 用户配置默认写在 `%APPDATA%\com.zentrix566.mypicviewer`，如需真正便携可后续加"配置随 exe 走"选项

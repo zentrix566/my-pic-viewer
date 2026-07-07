@@ -22,6 +22,7 @@ const emit = defineEmits<{
   (e: 'toggleInfo'): void
   (e: 'toggleThumbnails'): void
   (e: 'toggleFullscreen'): void
+  (e: 'about'): void
 }>()
 </script>
 
@@ -61,6 +62,7 @@ const emit = defineEmits<{
       @click="emit('toggleInfo')"
     >ⓘ</button>
     <button title="全屏 (F11)" @click="emit('toggleFullscreen')">⛶</button>
+    <button title="关于" @click="emit('about')">?</button>
   </header>
 </template>
 

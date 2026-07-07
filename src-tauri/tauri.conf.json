@@ -34,6 +34,12 @@
   "bundle": {
     "active": true,
     "targets": ["nsis"],
+    "publisher": "zentrix566",
+    "copyright": "© 2026 zentrix566",
+    "category": "Utility",
+    "shortDescription": "绿色版图片浏览器",
+    "longDescription": "由 zentrix566 制作的绿色版图片浏览器：左右浏览、滚轮以鼠标位置为中心缩放、拖拽平移、旋转、Delete 到回收站、EXIF 信息、缩略图、文件关联，单个 exe 直接运行。",
+    "homepage": "https://github.com/zentrix566/my-pic-viewer",
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
