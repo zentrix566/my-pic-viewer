@@ -1,6 +1,6 @@
 [package]
 name = "my-pic-viewer"
-version = "1.0.0"
+version = "1.0.1"
 description = "绿色版图片浏览器"
 authors = ["zentrix566"]
 edition = "2021"
