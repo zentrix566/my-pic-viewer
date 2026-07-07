@@ -107,6 +107,35 @@ npm run dev
 cargo clean --manifest-path src-tauri/Cargo.toml
 ```
 
+## 发布新版本（GitHub Release）
+
+本项目已配置 GitHub Actions（`.github/workflows/release.yml`），**打 tag 就自动构建 & 发布**：
+
+```bash
+# 1. 更新版本号（package.json / src-tauri/Cargo.toml / src-tauri/tauri.conf.json 三处保持一致）
+# 2. 提交
+git add -A
+git commit -m "chore: 发布 v1.0.1"
+
+# 3. 打 tag（tag 名必须以 v 开头）
+git tag v1.0.1
+git push origin main
+git push origin v1.0.1
+```
+
+推 tag 后，GitHub Actions 会：
+
+1. 在 Windows runner 上安装 Node + Rust
+2. 跑 `npm ci` + `tauri build`
+3. 自动创建 GitHub Release，附带以下产物：
+   - `my-pic-viewer_<version>_portable.exe`（**绿色版单 exe，推荐**）
+   - `my-pic-viewer_<version>_x64-setup.exe`（NSIS 安装包）
+   - `my-pic-viewer_<version>_x64-setup.nsis.zip`（NSIS 归档）
+
+整个过程约 5-10 分钟，进度可以在仓库 `Actions` 页面查看。
+
+如果只想手动测一次 workflow（不打 tag、不发 release），可以在 GitHub 仓库 `Actions → Release → Run workflow` 手动触发。
+
 ## 目录结构
 
 ```
