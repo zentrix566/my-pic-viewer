@@ -1,4 +1,4 @@
-use crate::{exif, file_ops, image_scan};
+use crate::{exif, file_ops, image_scan, update};
 use serde::Serialize;
 use std::path::{Path, PathBuf};
 use tauri_plugin_clipboard_manager::ClipboardExt;
@@ -109,4 +109,22 @@ fn normalize_path(p: &Path) -> String {
   } else {
     s
   }
+}
+
+/// 检查 GitHub 上是否有新版本
+#[tauri::command]
+pub fn check_update() -> update::UpdateCheckResult {
+  update::check_latest_release()
+}
+
+/// 在系统默认浏览器中打开链接
+#[tauri::command]
+pub fn open_url(url: String) -> Result<(), String> {
+  webbrowser::open(&url).map_err(|e| e.to_string())
+}
+
+/// 移动图片到指定分类目录（复制后删除原文件）
+#[tauri::command]
+pub fn move_file_to_dir(src: String, dst_dir: String) -> Result<String, String> {
+  file_ops::move_to_dir(&src, &dst_dir)
 }

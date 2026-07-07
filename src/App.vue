@@ -50,6 +50,43 @@ const showInfo = ref(true)
 const showThumbnails = ref(true)
 const isFullscreen = ref(false)
 
+// ---------- 分类目录 ----------
+const LS_GOOD = 'my-pic-viewer:goodDir'
+const LS_BAD = 'my-pic-viewer:badDir'
+const goodDir = ref(localStorage.getItem(LS_GOOD) || '')
+const badDir = ref(localStorage.getItem(LS_BAD) || '')
+
+watch(goodDir, (v) => { if (v) localStorage.setItem(LS_GOOD, v); else localStorage.removeItem(LS_GOOD) })
+watch(badDir, (v) => { if (v) localStorage.setItem(LS_BAD, v); else localStorage.removeItem(LS_BAD) })
+
+async function setGoodDir() {
+  const picked = await openDialog({ directory: true, multiple: false, title: '选择「合适」目录' })
+  if (typeof picked === 'string' && picked) goodDir.value = picked
+}
+
+async function setBadDir() {
+  const picked = await openDialog({ directory: true, multiple: false, title: '选择「不合适」目录' })
+  if (typeof picked === 'string' && picked) badDir.value = picked
+}
+
+async function moveCurrentTo(targetDir: string, label: string) {
+  const p = currentPath.value
+  if (!p) return
+  if (!targetDir) {
+    await message(`请先设置「${label}」目录`, { title: '提示', kind: 'info' })
+    return
+  }
+  try {
+    await tauriApi.moveFileToDir(p, targetDir)
+    removeCurrent()
+  } catch (err) {
+    await message(`移动失败: ${err}`, { title: '错误', kind: 'error' })
+  }
+}
+
+async function moveToGood() { await moveCurrentTo(goodDir.value, '合适') }
+async function moveToBad() { await moveCurrentTo(badDir.value, '不合适') }
+
 // 当前图片元数据
 const fileInfo = ref<ImageFileInfo | null>(null)
 const exif = ref<ExifInfo | null>(null)
@@ -211,6 +248,33 @@ async function showAbout() {
   await message(body, { title: '关于 my-pic-viewer', kind: 'info' })
 }
 
+// ---------- 检查更新 ----------
+async function checkForUpdate() {
+  try {
+    const result = await tauriApi.checkUpdate()
+    if (result.error) {
+      await message(`检查更新失败：${result.error}`, { title: '检查更新', kind: 'error' })
+      return
+    }
+    if (result.hasUpdate && result.latestTag && result.releaseUrl) {
+      const ok = await confirm(
+        `发现新版本 ${result.latestTag}（当前 ${result.currentVersion}），是否前往下载？`,
+        { title: '检查更新', kind: 'info', okLabel: '去下载', cancelLabel: '取消' }
+      )
+      if (ok) {
+        await tauriApi.openUrl(result.releaseUrl)
+      }
+    } else {
+      await message(`当前已是最新版本 ${result.currentVersion} ✓`, {
+        title: '检查更新',
+        kind: 'info'
+      })
+    }
+  } catch (e) {
+    await message(`检查更新失败：${e}`, { title: '检查更新', kind: 'error' })
+  }
+}
+
 // ---------- 键盘 ----------
 useKeyboard({
   onPrev: () => prev(),
@@ -232,7 +296,9 @@ useKeyboard({
   onToggleInfo: () => (showInfo.value = !showInfo.value),
   onToggleThumbnails: () => (showThumbnails.value = !showThumbnails.value),
   onToggleFullscreen: () => void toggleFullscreen(),
-  onExitFullscreen: () => void exitFullscreen()
+  onExitFullscreen: () => void exitFullscreen(),
+  onMoveToGood: () => void moveToGood(),
+  onMoveToBad: () => void moveToBad()
 })
 
 // ---------- 拖拽文件 & 命令行参数 ----------
@@ -257,6 +323,8 @@ onMounted(async () => {
       :has-image="hasImage"
       :show-info="showInfo"
       :show-thumbnails="showThumbnails"
+      :good-dir="goodDir"
+      :bad-dir="badDir"
       @open="chooseFile"
       @prev="prev"
       @next="next"
@@ -274,6 +342,11 @@ onMounted(async () => {
       @toggle-thumbnails="showThumbnails = !showThumbnails"
       @toggle-fullscreen="toggleFullscreen"
       @about="showAbout"
+      @check-update="checkForUpdate"
+      @set-good-dir="setGoodDir"
+      @set-bad-dir="setBadDir"
+      @move-to-good="moveToGood"
+      @move-to-bad="moveToBad"
     />
 
     <div class="body">
@@ -283,6 +356,7 @@ onMounted(async () => {
           class="canvas"
           @dblclick="fitToWindow"
           @loaded="onImageLoaded"
+          @copy="copyCurrent"
         />
         <!-- 悬浮翻页箭头：只在多张图时显示 -->
         <button
@@ -321,6 +395,8 @@ onMounted(async () => {
       :width="naturalWidth"
       :height="naturalHeight"
       :file-name="currentName"
+      :good-dir="goodDir"
+      :bad-dir="badDir"
     />
   </div>
 </template>

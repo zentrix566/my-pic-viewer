@@ -6,7 +6,14 @@ defineProps<{
   width: number
   height: number
   fileName: string
+  goodDir: string
+  badDir: string
 }>()
+
+function getShortName(p: string): string {
+  const parts = p.replace(/\\/g, '/').split('/')
+  return parts[parts.length - 1] || parts[parts.length - 2] || p
+}
 </script>
 
 <template>
@@ -18,6 +25,9 @@ defineProps<{
     <span class="sep">|</span>
     <span v-if="width && height">{{ width }} × {{ height }}</span>
     <span class="spacer" />
+    <span v-if="goodDir" class="dir-badge good" title="合适目录">✅ {{ getShortName(goodDir) }}</span>
+    <span v-if="badDir" class="dir-badge bad" title="不合适目录">❌ {{ getShortName(badDir) }}</span>
+    <span class="sep" v-if="goodDir || badDir" />
     <span>{{ Math.round(scale * 100) }}%</span>
   </footer>
 </template>
@@ -41,5 +51,22 @@ defineProps<{
 }
 .spacer {
   flex: 1;
+}
+.dir-badge {
+  font-size: 11px;
+  padding: 1px 6px;
+  border-radius: 3px;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dir-badge.good {
+  background: rgba(60, 160, 80, 0.18);
+  color: #6cdb8a;
+}
+.dir-badge.bad {
+  background: rgba(180, 60, 60, 0.18);
+  color: #db6c6c;
 }
 </style>

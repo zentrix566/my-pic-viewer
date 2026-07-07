@@ -1,6 +1,6 @@
 [package]
 name = "my-pic-viewer"
-version = "1.0.2"
+version = "1.0.3"
 description = "绿色版图片浏览器"
 authors = ["zentrix566"]
 edition = "2021"
@@ -42,6 +42,13 @@ image = { version = "0.25", default-features = false, features = [
 
 # 自然排序，让文件名 img2 排在 img10 前面
 natord = "1"
+
+# 检查更新：拉 GitHub Releases API
+# rustls 而不是 native-tls，避免 OpenSSL/schannel 差异，同时能纯静态编译
+ureq = { version = "2", default-features = false, features = ["json", "tls"] }
+
+# 在默认浏览器中打开链接
+webbrowser = "1"
 
 [features]
 # 默认不启用任何额外特性

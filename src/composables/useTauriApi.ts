@@ -1,6 +1,6 @@
 // 封装所有对 Rust 后端 command 的调用
 import { invoke } from '@tauri-apps/api/core'
-import type { ExifInfo, ImageFileInfo, ImageListResult } from '../types'
+import type { ExifInfo, ImageFileInfo, ImageListResult, UpdateCheckResult } from '../types'
 
 export const tauriApi = {
   listImagesInDir(path: string) {
@@ -23,5 +23,14 @@ export const tauriApi = {
   },
   copyImageToClipboard(path: string) {
     return invoke<void>('copy_image_to_clipboard', { path })
+  },
+  checkUpdate() {
+    return invoke<UpdateCheckResult>('check_update')
+  },
+  openUrl(url: string) {
+    return invoke<void>('open_url', { url })
+  },
+  moveFileToDir(src: string, dstDir: string) {
+    return invoke<string>('move_file_to_dir', { src, dstDir })
   }
 }

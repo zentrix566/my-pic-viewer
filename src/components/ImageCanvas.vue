@@ -10,6 +10,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'dblclick'): void
   (e: 'loaded', payload: { width: number; height: number }): void
+  (e: 'copy'): void
 }>()
 
 const viewport = useViewport()
@@ -17,6 +18,31 @@ const containerRef = ref<HTMLDivElement | null>(null)
 const imgRef = ref<HTMLImageElement | null>(null)
 
 const src = computed(() => (props.path ? convertFileSrc(props.path) : ''))
+
+// ------- 右键菜单 -------
+const contextMenu = ref({ show: false, x: 0, y: 0 })
+
+function onContextMenu(e: MouseEvent) {
+  e.preventDefault()
+  if (!props.path) return
+  contextMenu.value = { show: true, x: e.clientX, y: e.clientY }
+}
+
+function closeContextMenu() {
+  contextMenu.value.show = false
+}
+
+function onCopy() {
+  closeContextMenu()
+  emit('copy')
+}
+
+// 点击页面其他地方关闭菜单
+function onGlobalClick() {
+  closeContextMenu()
+}
+onMounted(() => window.addEventListener('click', onGlobalClick))
+onBeforeUnmount(() => window.removeEventListener('click', onGlobalClick))
 
 // ------- 容器尺寸监听 -------
 let resizeObserver: ResizeObserver | null = null
@@ -112,6 +138,7 @@ function onDblClick() {
     @pointerup="onPointerUp"
     @pointercancel="onPointerUp"
     @dblclick="onDblClick"
+    @contextmenu="onContextMenu"
   >
     <img
       v-if="src"
@@ -125,6 +152,17 @@ function onDblClick() {
     <div v-else class="empty-hint">
       <p>拖拽图片到此处，或按 Ctrl+O 打开</p>
     </div>
+
+    <!-- 右键菜单 -->
+    <Teleport to="body">
+      <div
+        v-if="contextMenu.show"
+        class="ctx-menu"
+        :style="{ left: contextMenu.x + 'px', top: contextMenu.y + 'px' }"
+      >
+        <button class="ctx-item" @click="onCopy">📋 复制路径</button>
+      </div>
+    </Teleport>
   </div>
 </template>
 
@@ -157,5 +195,35 @@ function onDblClick() {
   color: #6a6a75;
   font-size: 14px;
   pointer-events: none;
+}
+
+/* ---------- 自定义右键菜单 ---------- */
+.ctx-menu {
+  position: fixed;
+  z-index: 9999;
+  min-width: 140px;
+  background: #1e1e26;
+  border: 1px solid #3a3a44;
+  border-radius: 6px;
+  padding: 4px 0;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+}
+.ctx-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 14px;
+  background: transparent;
+  color: #d0d0d8;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  white-space: nowrap;
+  text-align: left;
+}
+.ctx-item:hover {
+  background: #2a3a55;
 }
 </style>

@@ -1,8 +1,15 @@
 <script setup lang="ts">
+function getDirName(p: string): string {
+  const parts = p.replace(/\\/g, '/').split('/')
+  return parts[parts.length - 1] || parts[parts.length - 2] || p
+}
+
 defineProps<{
   hasImage: boolean
   showInfo: boolean
   showThumbnails: boolean
+  goodDir: string
+  badDir: string
 }>()
 
 const emit = defineEmits<{
@@ -23,6 +30,11 @@ const emit = defineEmits<{
   (e: 'toggleThumbnails'): void
   (e: 'toggleFullscreen'): void
   (e: 'about'): void
+  (e: 'checkUpdate'): void
+  (e: 'setGoodDir'): void
+  (e: 'setBadDir'): void
+  (e: 'moveToGood'): void
+  (e: 'moveToBad'): void
 }>()
 </script>
 
@@ -50,6 +62,23 @@ const emit = defineEmits<{
       :disabled="!hasImage"
       @click="emit('delete')"
     >🗑</button>
+    <span class="sep" />
+    <button title="设置「合适」目录" @click="emit('setGoodDir')" class="cfg-good">📁✅</button>
+    <button title="设置「不合适」目录" @click="emit('setBadDir')" class="cfg-bad">📁❌</button>
+    <button
+      v-if="goodDir"
+      :title="'移动到合适目录 (Z): ' + goodDir"
+      :disabled="!hasImage"
+      @click="emit('moveToGood')"
+      class="action-good"
+    >→ ✅ {{ getDirName(goodDir) }}</button>
+    <button
+      v-if="badDir"
+      :title="'移动到不合适目录 (X): ' + badDir"
+      :disabled="!hasImage"
+      @click="emit('moveToBad')"
+      class="action-bad"
+    >→ ❌ {{ getDirName(badDir) }}</button>
     <span class="spacer" />
     <button
       title="切换缩略图条 (T)"
@@ -62,6 +91,7 @@ const emit = defineEmits<{
       @click="emit('toggleInfo')"
     >ⓘ</button>
     <button title="全屏 (F11)" @click="emit('toggleFullscreen')">⛶</button>
+    <button title="检查更新" @click="emit('checkUpdate')">⏬</button>
     <button title="关于" @click="emit('about')">?</button>
   </header>
 </template>
@@ -105,6 +135,54 @@ button.active {
 button.danger:hover:not(:disabled) {
   background: #4a1e1e;
   border-color: #7a2828;
+}
+
+/* ---------- 分类目录设置按钮（小） ---------- */
+button.cfg-good,
+button.cfg-bad {
+  font-size: 12px;
+  padding: 0 6px;
+  min-width: auto;
+}
+button.cfg-good {
+  color: #7ad89a;
+}
+button.cfg-bad {
+  color: #d87a7a;
+}
+
+/* ---------- 移动操作按钮（醒目大按钮） ---------- */
+button.action-good,
+button.action-bad {
+  font-size: 13px;
+  padding: 0 12px;
+  min-width: 56px;
+  max-width: 220px;
+  height: 30px;
+  border-radius: 5px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+button.action-good {
+  background: #1e4a2a;
+  color: #7ad89a;
+  border-color: #2a6a3a;
+}
+button.action-good:hover:not(:disabled) {
+  background: #2a6a3a;
+  border-color: #4a9a5a;
+}
+button.action-bad {
+  background: #4a1e1e;
+  color: #d87a7a;
+  border-color: #6a2a2a;
+}
+button.action-bad:hover:not(:disabled) {
+  background: #6a2a2a;
+  border-color: #9a4a4a;
 }
 .sep {
   width: 1px;

@@ -32,3 +32,12 @@ export interface ImageItem {
   path: string
   name: string
 }
+
+// 检查更新的返回结果
+export interface UpdateCheckResult {
+  hasUpdate: boolean
+  latestTag: string | null
+  currentVersion: string
+  releaseUrl: string | null
+  error: string | null
+}

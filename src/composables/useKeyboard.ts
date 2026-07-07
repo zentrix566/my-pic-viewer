@@ -22,6 +22,8 @@ export interface KeyHandlers {
   onToggleThumbnails: () => void
   onToggleFullscreen: () => void
   onExitFullscreen: () => void
+  onMoveToGood?: () => void
+  onMoveToBad?: () => void
 }
 
 export function useKeyboard(h: KeyHandlers) {
@@ -100,6 +102,12 @@ export function useKeyboard(h: KeyHandlers) {
         e.preventDefault(); h.onToggleFullscreen(); break
       case 'Escape':
         h.onExitFullscreen(); break
+      case 'z':
+      case 'Z':
+        e.preventDefault(); h.onMoveToGood?.(); break
+      case 'x':
+      case 'X':
+        e.preventDefault(); h.onMoveToBad?.(); break
     }
   }
 

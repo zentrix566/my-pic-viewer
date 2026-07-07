@@ -4,6 +4,7 @@ mod commands;
 mod exif;
 mod file_ops;
 mod image_scan;
+mod update;
 
 /// 应用入口，被 main.rs 调用
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -46,6 +47,9 @@ pub fn run() {
       commands::rename_file,
       commands::copy_file_to,
       commands::copy_image_to_clipboard,
+      commands::check_update,
+      commands::open_url,
+      commands::move_file_to_dir,
     ])
     .run(tauri::generate_context!())
     .expect("启动 Tauri 应用失败");
