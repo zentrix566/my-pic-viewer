@@ -2,6 +2,11 @@
 
 本项目遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/)，日期格式为 `YYYY-MM-DD`。
 
+## [1.0.4] - 2026-07-09
+
+### Fixed
+- **修复打开白屏问题**：Vite 构建产物使用绝对路径 `/assets/...` 引用静态资源，在 Tauri 自定义协议（`asset://` / `https://tauri.localhost`）下无法正确解析，导致 JS/CSS 加载失败，页面空白。将 Vite `base` 配置改为 `./`（相对路径）后资源可正常加载。
+
 ## [1.0.3] - 2026-07-07
 
 ### Added

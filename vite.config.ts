@@ -6,6 +6,9 @@ import vue from '@vitejs/plugin-vue'
 export default defineConfig(async () => ({
   plugins: [vue()],
 
+  // 使用相对路径，避免 Tauri 自定义协议下资源加载失败导致白屏
+  base: './',
+
   // 阻止 vite 覆盖 Tauri 的错误处理并保持一致的开发端口
   clearScreen: false,
 
