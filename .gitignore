@@ -31,3 +31,6 @@ Desktop.ini
 
 # TypeScript 增量构建
 *.tsbuildinfo
+
+# 工具内部目录（WorkBuddy 记忆等，不进版本库）
+.workbuddy/

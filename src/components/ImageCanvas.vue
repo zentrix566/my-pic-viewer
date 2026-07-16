@@ -160,7 +160,7 @@ function onDblClick() {
         class="ctx-menu"
         :style="{ left: contextMenu.x + 'px', top: contextMenu.y + 'px' }"
       >
-        <button class="ctx-item" @click="onCopy">📋 复制路径</button>
+        <button class="ctx-item" @click="onCopy">📋 复制图片</button>
       </div>
     </Teleport>
   </div>
@@ -172,7 +172,7 @@ function onDblClick() {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background: #101014;
+  background: #2a2a30;
   cursor: grab;
   user-select: none;
   display: flex;

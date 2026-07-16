@@ -24,6 +24,9 @@ export const tauriApi = {
   copyImageToClipboard(path: string) {
     return invoke<void>('copy_image_to_clipboard', { path })
   },
+  takePendingFile() {
+    return invoke<string | null>('take_pending_file')
+  },
   checkUpdate() {
     return invoke<UpdateCheckResult>('check_update')
   },

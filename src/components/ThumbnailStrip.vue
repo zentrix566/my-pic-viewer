@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { convertFileSrc } from '@tauri-apps/api/core'
+import { baseName } from '../utils/path'
 
 const props = defineProps<{
   items: string[]
@@ -10,13 +11,6 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'select', index: number): void
 }>()
-
-/// 从完整路径取文件名
-function baseName(p: string): string {
-  const s = p.replace(/\\/g, '/')
-  const i = s.lastIndexOf('/')
-  return i >= 0 ? s.slice(i + 1) : s
-}
 
 const previewItems = computed(() =>
   props.items.map((p, i) => ({

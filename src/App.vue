@@ -167,7 +167,7 @@ async function deleteCurrent() {
   }
 }
 
-// ---------- 复制路径 ----------
+// ---------- 复制图片 ----------
 async function copyCurrent() {
   const p = currentPath.value
   if (!p) return
@@ -314,6 +314,10 @@ onMounted(async () => {
       if (paths && paths[0]) await openPath(paths[0])
     }
   })
+
+  // 监听已就绪，拉取启动时（如双击图片）待打开的文件
+  const pending = await tauriApi.takePendingFile()
+  if (pending) void openPath(pending)
 })
 </script>
 

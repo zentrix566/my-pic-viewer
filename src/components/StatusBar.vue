@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { baseName } from '../utils/path'
+
 defineProps<{
   index: number
   total: number
@@ -9,11 +11,6 @@ defineProps<{
   goodDir: string
   badDir: string
 }>()
-
-function getShortName(p: string): string {
-  const parts = p.replace(/\\/g, '/').split('/')
-  return parts[parts.length - 1] || parts[parts.length - 2] || p
-}
 </script>
 
 <template>
@@ -25,8 +22,8 @@ function getShortName(p: string): string {
     <span class="sep">|</span>
     <span v-if="width && height">{{ width }} × {{ height }}</span>
     <span class="spacer" />
-    <span v-if="goodDir" class="dir-badge good" title="合适目录">✅ {{ getShortName(goodDir) }}</span>
-    <span v-if="badDir" class="dir-badge bad" title="不合适目录">❌ {{ getShortName(badDir) }}</span>
+    <span v-if="goodDir" class="dir-badge good" title="合适目录">✅ {{ baseName(goodDir) }}</span>
+    <span v-if="badDir" class="dir-badge bad" title="不合适目录">❌ {{ baseName(badDir) }}</span>
     <span class="sep" v-if="goodDir || badDir" />
     <span>{{ Math.round(scale * 100) }}%</span>
   </footer>

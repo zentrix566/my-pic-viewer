@@ -2,6 +2,16 @@
 
 本项目遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/)，日期格式为 `YYYY-MM-DD`。
 
+## [1.0.5] - 2026-07-16
+
+### Fixed
+- **修复右键"复制图片"实际只复制了路径文本的问题**：后端 `copy_image_to_clipboard` 命令此前调用的是 `write_text(path)`，会把文件路径作为文本写入剪贴板；现改为用 `image` 解码图片为 RGBA 位图后写入系统剪贴板，右键菜单与 `Ctrl+C` 真正复制图片本身。同步将菜单与按钮文案由"复制路径"更正为"复制图片"。
+- **更改图片查看区背景色**：由近黑色 `#101014` 改为中性深灰 `#2a2a30`，减弱纯黑背景下屏幕映出人影的反光观感。
+- **修复启动打开文件的竞态**：此前靠固定 `400ms` 延迟 `emit('open-file')`，若前端挂载较晚会丢失"双击图片启动"传入的文件。改为把初始文件路径存入 `PendingFile` 状态，新增 `take_pending_file` 命令，由前端挂载、监听就绪后主动拉取，确保文件稳定打开。
+
+### Refactored
+- **抽取公共路径工具 `src/utils/path.ts`**：统一 `baseName()`，消除 `Toolbar` / `StatusBar` / `ThumbnailStrip` 三处重复的"取文件名"实现。
+
 ## [1.0.4] - 2026-07-09
 
 ### Fixed

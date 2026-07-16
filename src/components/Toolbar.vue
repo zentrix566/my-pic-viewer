@@ -1,8 +1,5 @@
 <script setup lang="ts">
-function getDirName(p: string): string {
-  const parts = p.replace(/\\/g, '/').split('/')
-  return parts[parts.length - 1] || parts[parts.length - 2] || p
-}
+import { baseName } from '../utils/path'
 
 defineProps<{
   hasImage: boolean
@@ -53,7 +50,7 @@ const emit = defineEmits<{
     <button title="逆时针旋转 (Shift+R)" :disabled="!hasImage" @click="emit('rotateCcw')">⟲</button>
     <button title="顺时针旋转 (R)" :disabled="!hasImage" @click="emit('rotateCw')">⟳</button>
     <span class="sep" />
-    <button title="复制路径 (Ctrl+C)" :disabled="!hasImage" @click="emit('copy')">📋</button>
+    <button title="复制图片 (Ctrl+C)" :disabled="!hasImage" @click="emit('copy')">📋</button>
     <button title="另存为 (Ctrl+S)" :disabled="!hasImage" @click="emit('saveAs')">💾</button>
     <button title="重命名 (F2)" :disabled="!hasImage" @click="emit('rename')">✎</button>
     <button
@@ -71,14 +68,14 @@ const emit = defineEmits<{
       :disabled="!hasImage"
       @click="emit('moveToGood')"
       class="action-good"
-    >→ ✅ {{ getDirName(goodDir) }}</button>
+    >→ ✅ {{ baseName(goodDir) }}</button>
     <button
       v-if="badDir"
       :title="'移动到不合适目录 (X): ' + badDir"
       :disabled="!hasImage"
       @click="emit('moveToBad')"
       class="action-bad"
-    >→ ❌ {{ getDirName(badDir) }}</button>
+    >→ ❌ {{ baseName(badDir) }}</button>
     <span class="spacer" />
     <button
       title="切换缩略图条 (T)"

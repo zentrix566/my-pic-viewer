@@ -1,3 +1,4 @@
+use std::sync::Mutex;
 use tauri::{Emitter, Manager};
 
 mod commands;
@@ -5,6 +6,8 @@ mod exif;
 mod file_ops;
 mod image_scan;
 mod update;
+
+use commands::PendingFile;
 
 /// 应用入口，被 main.rs 调用
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -27,16 +30,11 @@ pub fn run() {
     .plugin(tauri_plugin_clipboard_manager::init())
     .setup(|app| {
       // 首次启动时，从 CLI 参数里取要打开的文件（Windows 文件关联双击时携带）
+      // 不直接 emit，而是存进 managed state，由前端挂载完成、监听就绪后再来取，
+      // 避免事件早于前端监听者发出而永久丢失（原来用固定 400ms sleep 不稳定）。
       let args: Vec<String> = std::env::args().skip(1).collect();
       let initial_file = args.into_iter().find(|a| !a.starts_with('-'));
-      if let Some(path) = initial_file {
-        // 延迟到前端 ready 后再发，用一次性 setTimeout 前端里再监听
-        let handle = app.handle().clone();
-        std::thread::spawn(move || {
-          std::thread::sleep(std::time::Duration::from_millis(400));
-          let _ = handle.emit("open-file", path);
-        });
-      }
+      app.manage(PendingFile(Mutex::new(initial_file)));
       Ok(())
     })
     .invoke_handler(tauri::generate_handler![
@@ -47,6 +45,7 @@ pub fn run() {
       commands::rename_file,
       commands::copy_file_to,
       commands::copy_image_to_clipboard,
+      commands::take_pending_file,
       commands::check_update,
       commands::open_url,
       commands::move_file_to_dir,

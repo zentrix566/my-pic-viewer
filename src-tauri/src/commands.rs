@@ -1,7 +1,12 @@
 use crate::{exif, file_ops, image_scan, update};
 use serde::Serialize;
 use std::path::{Path, PathBuf};
+use std::sync::Mutex;
+use tauri::State;
 use tauri_plugin_clipboard_manager::ClipboardExt;
+
+/// 启动时被双击打开的文件路径，存于此供前端挂载后拉取（见 take_pending_file）
+pub struct PendingFile(pub Mutex<Option<String>>);
 
 /// 图片列表返回值
 #[derive(Debug, Serialize)]
@@ -94,11 +99,26 @@ pub fn copy_file_to(src: String, dst: String) -> Result<(), String> {
   file_ops::copy_to(&src, &dst)
 }
 
-/// 把图片放到剪贴板。Tauri 剪贴板插件目前主要支持文本，我们退而写入文件路径文本
-/// 让用户可以在其他程序里粘贴路径；后续可扩展成写入位图
+/// 把图片本身（位图）放到剪贴板，而不是复制文件路径文本。
+/// 用 image 解码任意常见格式为 RGBA，再交给剪贴板插件写入系统剪贴板。
 #[tauri::command]
 pub fn copy_image_to_clipboard(app: tauri::AppHandle, path: String) -> Result<(), String> {
-  app.clipboard().write_text(path).map_err(|e| e.to_string())
+  let rgba = image::open(&path)
+    .map_err(|e| format!("无法解码图片: {e}"))?
+    .to_rgba8();
+  let (width, height) = (rgba.width(), rgba.height());
+  let image = tauri::image::Image::new_owned(rgba.into_raw(), width, height);
+  app
+    .clipboard()
+    .write_image(&image)
+    .map_err(|e| e.to_string())
+}
+
+/// 取出并清空「启动时待打开的文件」，仅首次有效。
+/// 前端完成挂载、监听就绪后调用，避免事件早于监听者发出而丢失。
+#[tauri::command]
+pub fn take_pending_file(state: State<PendingFile>) -> Option<String> {
+  state.0.lock().unwrap().take()
 }
 
 /// Windows 上路径大小写不敏感，做归一化再比较
