@@ -1,7 +1,7 @@
 {
   "name": "my-pic-viewer",
   "private": true,
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "绿色版图片浏览器 - Tauri + Vue 3 + TypeScript",
   "type": "module",
   "scripts": {
